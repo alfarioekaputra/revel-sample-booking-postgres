@@ -6,20 +6,20 @@ import (
 	"regexp"
 )
 
-type User struct {
+type HotelUser struct {
 	UserId             int
 	Name               string
 	Username, Password string
 	HashedPassword     []byte
 }
 
-func (u *User) String() string {
-	return fmt.Sprintf("User(%s)", u.Username)
+func (u *HotelUser) String() string {
+	return fmt.Sprintf("HotelUser(%s)", u.Username)
 }
 
 var userRegex = regexp.MustCompile("^\\w*$")
 
-func (user *User) Validate(v *revel.Validation) {
+func (user *HotelUser) Validate(v *revel.Validation) {
 	v.Check(user.Username,
 		revel.Required{},
 		revel.MaxSize{15},

@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"golang.org/x/crypto/bcrypt"
 	"fmt"
 	"github.com/revel/revel"
 	"github.com/revel/samples/booking/app/models"
 	"github.com/revel/samples/booking/app/routes"
+	"golang.org/x/crypto/bcrypt"
 	"strings"
 )
 
@@ -23,7 +23,7 @@ func (c Hotels) checkUser() revel.Result {
 
 func (c Hotels) Index() revel.Result {
 	results, err := c.Txn.Select(models.Booking{},
-		`select * from Booking where UserId = ?`, c.connected().UserId)
+		`select * from Booking where UserId = $1`, c.connected().UserId)
 	if err != nil {
 		panic(err)
 	}
@@ -47,12 +47,12 @@ func (c Hotels) List(search string, size, page int) revel.Result {
 	var hotels []*models.Hotel
 	if search == "" {
 		hotels = loadHotels(c.Txn.Select(models.Hotel{},
-			`select * from Hotel limit ?, ?`, (page-1)*size, size))
+			`select * from Hotel limit $1, $2`, (page-1)*size, size))
 	} else {
 		search = strings.ToLower(search)
 		hotels = loadHotels(c.Txn.Select(models.Hotel{},
-			`select * from Hotel where lower(Name) like ? or lower(City) like ?
- limit ?, ?`, "%"+search+"%", "%"+search+"%", (page-1)*size, size))
+			`select * from Hotel where lower(Name) like $1 or lower(City) like $2
+ limit $3, $4`, "%"+search+"%", "%"+search+"%", (page-1)*size, size))
 	}
 
 	return c.Render(hotels, search, size, page, nextPage)
@@ -105,7 +105,7 @@ func (c Hotels) SaveSettings(password, verifyPassword string) revel.Result {
 	}
 
 	bcryptPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	_, err := c.Txn.Exec("update User set HashedPassword = ? where UserId = ?",
+	_, err := c.Txn.Exec("update User set HashedPassword = $1 where UserId = $2",
 		bcryptPassword, c.connected().UserId)
 	if err != nil {
 		panic(err)

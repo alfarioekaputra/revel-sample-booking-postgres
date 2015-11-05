@@ -17,7 +17,7 @@ var (
 
 func InitDB() {
 	db.Init()
-	Dbm = &gorp.DbMap{Db: db.Db, Dialect: gorp.SqliteDialect{}}
+	Dbm = &gorp.DbMap{Db: db.Db, Dialect: gorp.PostgresDialect{}}
 
 	setColumnSizes := func(t *gorp.TableMap, colSizes map[string]int) {
 		for col, size := range colSizes {
@@ -25,7 +25,8 @@ func InitDB() {
 		}
 	}
 
-	t := Dbm.AddTable(models.User{}).SetKeys(true, "UserId")
+	t := Dbm.AddTable(models.HotelUser{}).SetKeys(true, "UserId")
+	t.ColMap("UserId").Rename("userid")
 	t.ColMap("Password").Transient = true
 	setColumnSizes(t, map[string]int{
 		"Username": 20,
@@ -57,7 +58,7 @@ func InitDB() {
 
 	bcryptPassword, _ := bcrypt.GenerateFromPassword(
 		[]byte("demo"), bcrypt.DefaultCost)
-	demoUser := &models.User{0, "Demo User", "demo", "demo", bcryptPassword}
+	demoUser := &models.HotelUser{0, "Demo User", "demo", "demo", bcryptPassword}
 	if err := Dbm.Insert(demoUser); err != nil {
 		panic(err)
 	}

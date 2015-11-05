@@ -24,7 +24,7 @@ type Booking struct {
 	// Transient
 	CheckInDate  time.Time
 	CheckOutDate time.Time
-	User         *User
+	User         *HotelUser
 	Hotel        *Hotel
 }
 
@@ -92,11 +92,11 @@ func (b *Booking) PostGet(exe gorp.SqlExecutor) error {
 		err error
 	)
 
-	obj, err = exe.Get(User{}, b.UserId)
+	obj, err = exe.Get(HotelUser{}, b.UserId)
 	if err != nil {
 		return fmt.Errorf("Error loading a booking's user (%d): %s", b.UserId, err)
 	}
-	b.User = obj.(*User)
+	b.User = obj.(*HotelUser)
 
 	obj, err = exe.Get(Hotel{}, b.HotelId)
 	if err != nil {
