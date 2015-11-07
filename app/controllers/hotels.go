@@ -47,12 +47,12 @@ func (c Hotels) List(search string, size, page int) revel.Result {
 	var hotels []*models.Hotel
 	if search == "" {
 		hotels = loadHotels(c.Txn.Select(models.Hotel{},
-			`select * from Hotel limit $1, $2`, (page-1)*size, size))
+			`select * from Hotel offset $1 limit $2`, (page-1)*size, size))
 	} else {
 		search = strings.ToLower(search)
 		hotels = loadHotels(c.Txn.Select(models.Hotel{},
 			`select * from Hotel where lower(Name) like $1 or lower(City) like $2
- limit $3, $4`, "%"+search+"%", "%"+search+"%", (page-1)*size, size))
+ offset $3 limit $4`, "%"+search+"%", "%"+search+"%", (page-1)*size, size))
 	}
 
 	return c.Render(hotels, search, size, page, nextPage)
